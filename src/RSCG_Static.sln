@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSCG_Static_Console", "RSCG_Static_Console\RSCG_Static_Console.csproj", "{F7C6D5CA-0254-4449-B4B7-12FDD6355731}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSCG_Static", "RSCG_Static\RSCG_Static.csproj", "{3D2FCEE9-6B4F-4716-A400-E0E6B32E2203}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7C6D5CA-0254-4449-B4B7-12FDD6355731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7C6D5CA-0254-4449-B4B7-12FDD6355731}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7C6D5CA-0254-4449-B4B7-12FDD6355731}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7C6D5CA-0254-4449-B4B7-12FDD6355731}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D2FCEE9-6B4F-4716-A400-E0E6B32E2203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D2FCEE9-6B4F-4716-A400-E0E6B32E2203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D2FCEE9-6B4F-4716-A400-E0E6B32E2203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D2FCEE9-6B4F-4716-A400-E0E6B32E2203}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C8B823E6-37B7-48FC-B1BC-29E5F4E1782D}
+	EndGlobalSection
+EndGlobal

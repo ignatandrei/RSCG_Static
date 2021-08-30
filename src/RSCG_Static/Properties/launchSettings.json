@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RSCG_Static": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\RSCG_Static_Console\\RSCG_Static_Console.csproj"
+    }
+  }
+}
