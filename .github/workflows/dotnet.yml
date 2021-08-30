@@ -1,0 +1,39 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: |
+        cd src 
+        dotnet restore
+    - name: Build
+      run: |
+        cd src 
+        dotnet build --no-restore
+    - name: pack
+      run: | 
+        cd src     
+        cd RSCG_Static
+        dotnet pack -o nugetPackages --no-build --include-symbols --include-source 
+    - name: 'Upload nuget'
+      uses: actions/upload-artifact@v2
+      with:
+        name: StaticNuget_${{github.run_number}}
+        path: src/RSCG_Static/nugetPackages
+        retention-days: 1
+        
