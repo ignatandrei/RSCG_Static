@@ -43,7 +43,7 @@ namespace RSCG_Static
                 template += $"{Environment.NewLine} }} //end makenew";
                 template += $"{Environment.NewLine} }} //end record";
 
-                template += $"{Environment.NewLine} public class cls{ret} ";
+                template += $"{Environment.NewLine} public class cls{ret} : {ret} ";
                 template += $"{Environment.NewLine} {{ ";
                 foreach (var prop in props)
                 {
