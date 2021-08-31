@@ -25,8 +25,8 @@
 
   </ItemGroup>
   <PropertyGroup>
-    <Version>2021.8.31.113</Version>
-    <PackageVersion>2021.8.31.113</PackageVersion>
+    <Version>2021.8.31.2027</Version>
+    <PackageVersion>2021.8.31.2027</PackageVersion>
     <Authors>Andrei Ignat</Authors>
     <Description>This package make you an interface and  record from static properties / methods </Description>
     <Title>StaticToClass</Title>

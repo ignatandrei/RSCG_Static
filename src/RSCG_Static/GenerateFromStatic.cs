@@ -33,21 +33,29 @@ namespace RSCG_Static
                 }
                 template += $"{Environment.NewLine} }}// interface";
                 template += $"{Environment.NewLine}//now the partial class";
-                template += $"{Environment.NewLine} public record cls{ret} ";
+                template += $"{Environment.NewLine} public record rec{ret} ";
                 var strDef = props.Select(it => $"{it.PropertyType.FullName} {it.Name}").ToArray();
                 template += $"({string.Join(",", strDef)}) : {ret}";
                 template += $"{Environment.NewLine} {{ ";
-                template += $"public static cls{ret} MakeNew() {{";
+                template += $"{Environment.NewLine}public static rec{ret} MakeNew() {{";
                 var strConstrParams = props.Select(it => $"{t.FullName}.{it.Name}");
-                template += $"{Environment.NewLine}return new cls{ret}({string.Join(",", strConstrParams)});";
+                template += $"{Environment.NewLine}return new rec{ret}({string.Join(",", strConstrParams)});";
                 template += $"{Environment.NewLine} }} //end makenew";
                 template += $"{Environment.NewLine} }} //end record";
-                template += $"{Environment.NewLine}//now the class";
+
+                template += $"{Environment.NewLine} public class cls{ret} ";
+                template += $"{Environment.NewLine} {{ ";
+                foreach (var prop in props)
+                {
+                    template += $"{Environment.NewLine}public  {prop.PropertyType.FullName} {prop.Name}  {{get {{ return {nameType}.{prop.Name}; }} }}";
+
+                }
+                template += $"{Environment.NewLine} }} //end record";
                 template += $"{Environment.NewLine}partial class {cd.Identifier.Text} {{";
 
                 template += $"{Environment.NewLine}public partial {ret} {item.Identifier.Text}() {{";
                 
-                template += $"{Environment.NewLine}return cls{ret}.MakeNew();";
+                template += $"{Environment.NewLine}return rec{ret}.MakeNew();";
                 template += $"{Environment.NewLine} }} // method";
                 template += $"{Environment.NewLine} }} // class";
                 template += $"{Environment.NewLine} }} // namespace";

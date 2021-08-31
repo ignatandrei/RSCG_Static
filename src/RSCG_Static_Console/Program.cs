@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace RSCG_Static_Console
 {
     partial class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            Console.WriteLine(new Program().FromStaticDate());
-            Console.WriteLine(clsISystem_Environment.MakeNew());
+            var  dateStatic1 = (new Program().FromStaticDate());//static
+            var dateStatic2 = recISystem_DateTime.MakeNew();//static
+            var dateVar3 = new clsISystem_DateTime(); //variable = real 
+            await Task.Delay(10*1000);
+            Console.WriteLine(dateStatic1.Now.Second);
+            Console.WriteLine(dateStatic2.Now.Second);
+            Console.WriteLine(dateVar3.Now.Second);
+
         }
 
         public partial ISystem_Environment FromStaticEnv();
