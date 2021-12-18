@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -18,8 +19,18 @@ namespace RSCG_Static
                 if (!item.Identifier.Text.StartsWith("FromStatic"))
                     continue;
                 var cd = item.Parent as ClassDeclarationSyntax;
+                string strNamespace = null;
                 var nameSpace = (cd?.Parent as NamespaceDeclarationSyntax);
-                var strNamespace = (nameSpace.Name as IdentifierNameSyntax).Identifier.Text;
+                if (nameSpace != null) {
+                    strNamespace = (nameSpace.Name as IdentifierNameSyntax).Identifier.Text;
+                }
+                else
+                {
+                    var parent = cd.Parent;
+                    var propName = parent.GetType().GetProperty("Name");
+                    var res= propName.GetGetMethod().Invoke(parent, null);
+                    strNamespace = (res as IdentifierNameSyntax).Identifier.Text;
+                }    
                 var ret = (item.ReturnType as IdentifierNameSyntax)?.Identifier.Text;
                 string nameType = ret?.Replace("_", ".")?.Substring(1);
                 var t = Type.GetType(nameType);
@@ -115,6 +126,7 @@ namespace RSCG_Static
 
         public void Initialize(GeneratorInitializationContext context)
         {
+            Debugger.Launch();
             context.RegisterForSyntaxNotifications(() => new ReceivePartialFunctionToStatic());
         }
 
