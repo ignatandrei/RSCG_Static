@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace RSCG_Static_Console
@@ -15,11 +16,12 @@ namespace RSCG_Static_Console
             Console.WriteLine(dateStatic1.Now.Second);
             Console.WriteLine(dateStatic2.Now.Second);
             Console.WriteLine(dateVar3.Now.Second);
-
+            
         }
 
         public partial ISystem_Environment FromStaticEnv();
         public partial ISystem_DateTime FromStaticDate();
+        public partial ISystem_Diagnostics_Process FromStaticProcess(Process p);
 
     }
 
