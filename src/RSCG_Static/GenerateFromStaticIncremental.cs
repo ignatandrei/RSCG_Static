@@ -10,6 +10,7 @@ using System.Threading;
 
 namespace RSCG_Static;
 
+
 [Generator]
 public class GenerateFromStaticIncremental : IIncrementalGenerator
 {
@@ -123,6 +124,7 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
         template += $"{rn} }} // namespace";
         return template;
     }
+
     ToGenerate[] fromType(ITypeSymbol t1)
     {
         return 
@@ -133,7 +135,13 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                    &&
                    (it.Kind == SymbolKind.Property
                    ||
-                   (it.Kind == SymbolKind.Method && (it as IMethodSymbol).Parameters.Length == 0))
+                   (
+                       it.Kind == SymbolKind.Method 
+                       && 
+                       (it as IMethodSymbol).Parameters.Length == 0
+                       &&
+                       (it as IMethodSymbol).MethodKind != MethodKind.PropertyGet
+                    ))
                    )
                    .Select(it =>
                    {

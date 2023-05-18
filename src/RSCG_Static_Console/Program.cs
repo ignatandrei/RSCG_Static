@@ -24,7 +24,7 @@ namespace RSCG_Static_Console
         }
 
         //public partial ISystem_Environment FromStaticEnv();
-        public partial ISystem_DateTime FromStaticDate(DateTime date);
+        public partial ISystem_DateTime FromStaticDate(DateTime doesNotMatter);
         //public partial ISystem_Diagnostics_Process FromStaticProcess(Process p);
 
     }
