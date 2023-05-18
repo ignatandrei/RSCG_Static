@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace RSCG_Static
 {
-    [Generator]
+    //[Generator]
     public class GenerateFromStatic : ISourceGenerator
     {
                 
@@ -126,77 +126,78 @@ namespace RSCG_Static
 
         public void Initialize(GeneratorInitializationContext context)
         {
-            Debugger.Launch();
+            //Debugger.Launch();
             context.RegisterForSyntaxNotifications(() => new ReceivePartialFunctionToStatic());
         }
 
         string GenerateImplementation(ToGenerate[] props, string strNamespace, string ret, string className, string funcName, string fullNameType,string optionalArgPartial)
         {
+            var rn = "\r\n";
             var template = "";
-            template += $"{Environment.NewLine} namespace {strNamespace} {{";
-            template += $"{Environment.NewLine} public interface {ret} {{";
+            template += $"{rn} namespace {strNamespace} {{";
+            template += $"{rn} public interface {ret} {{";
             foreach (var prop in props)
             {
                 switch (prop.symbolKind)
                 {
                     case SymbolKind.Property:
-                        template += $"{Environment.NewLine} {prop.TypeName} {prop.Name}  {{get;}}";
+                        template += $"{rn} {prop.TypeName} {prop.Name}  {{get;}}";
                         break;
                     case SymbolKind.Method:
-                        template += $"{Environment.NewLine} {prop.TypeName} {prop.Name}();";
+                        template += $"{rn} {prop.TypeName} {prop.Name}();";
                         break;
                     default:
                         throw new ArgumentException("do not support "+prop.symbolKind);
                 }
 
             }
-            template += $"{Environment.NewLine} }}// interface";
-            template += $"{Environment.NewLine}//now the partial class";
-            template += $"{Environment.NewLine} public record rec{ret} ";
+            template += $"{rn} }}// interface";
+            template += $"{rn}//now the partial class";
+            template += $"{rn} public record rec{ret} ";
             var strDef = props.Where(it=>it.symbolKind == SymbolKind.Property) .Select(it => $"{it.TypeName} {it.Name}").ToArray();
             template += $"({string.Join(",", strDef)}) : {ret}";
-            template += $"{Environment.NewLine} {{ ";
-            template += $"{Environment.NewLine}public static rec{ret} MakeNew() {{";
+            template += $"{rn} {{ ";
+            template += $"{rn}public static rec{ret} MakeNew() {{";
             var strConstrParams = props.Where(it=>it.symbolKind== SymbolKind.Property).Select(it => $"{fullNameType}.{it.Name}");
-            template += $"{Environment.NewLine}return new rec{ret}({string.Join(",", strConstrParams)});";
-            template += $"{Environment.NewLine} }} //end makenew";
+            template += $"{rn}return new rec{ret}({string.Join(",", strConstrParams)});";
+            template += $"{rn} }} //end makenew";
             var methods = props.Where(it => it.symbolKind == SymbolKind.Method).ToArray();
             foreach (var prop in methods)
             {
                 var isVoid = (prop.TypeName.ToLower() == "void");
                 var retData = isVoid ? "" : "return";
-                template += $"{Environment.NewLine}public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
+                template += $"{rn}public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
              
             }
             //adding methods
 
-            template += $"{Environment.NewLine} }} //end record";
+            template += $"{rn} }} //end record";
 
-            template += $"{Environment.NewLine} public class cls{ret} : {ret} ";
-            template += $"{Environment.NewLine} {{ ";
+            template += $"{rn} public class cls{ret} : {ret} ";
+            template += $"{rn} {{ ";
             foreach (var prop in props)
             {
                 switch (prop.symbolKind)
                 {
                     case SymbolKind.Property:
-                        template += $"{Environment.NewLine}public  {prop.TypeName} {prop.Name}  {{get {{ return {fullNameType}.{prop.Name}; }} }}";
+                        template += $"{rn}public  {prop.TypeName} {prop.Name}  {{get {{ return {fullNameType}.{prop.Name}; }} }}";
                         break;
                     case SymbolKind.Method:
                         var isVoid = (prop.TypeName.ToLower() == "void");
                         var retData = isVoid ? "" : "return";
-                        template += $"{Environment.NewLine}public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
+                        template += $"{rn}public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
                         break;
                 }
             }
-            template += $"{Environment.NewLine} }} //end record";
-            template += $"{Environment.NewLine}partial class {className} {{";
+            template += $"{rn} }} //end record";
+            template += $"{rn}partial class {className} {{";
 
-            template += $"{Environment.NewLine}public partial {ret} {funcName}({optionalArgPartial}) {{";
+            template += $"{rn}public partial {ret} {funcName}({optionalArgPartial}) {{";
 
-            template += $"{Environment.NewLine}return rec{ret}.MakeNew();";
-            template += $"{Environment.NewLine} }} // method";
-            template += $"{Environment.NewLine} }} // class";
-            template += $"{Environment.NewLine} }} // namespace";
+            template += $"{rn}return rec{ret}.MakeNew();";
+            template += $"{rn} }} // method";
+            template += $"{rn} }} // class";
+            template += $"{rn} }} // namespace";
             return template;
         }
     }

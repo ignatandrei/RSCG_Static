@@ -1,54 +1,56 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
-    <IsPackable>true</IsPackable>
-    <IsRoslynComponent>true</IsRoslynComponent>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>10.0</LangVersion>
+		<IsPackable>true</IsPackable>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <CompilerVisibleProperty Include="RootNamespace" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <None Include="readme.md" Pack="true" PackagePath="\" />
-    <None Include="../../docs/static.png" Pack="true" PackagePath="\" />
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	<ItemGroup>
 
-  </ItemGroup>
-  <PropertyGroup>
-    <Version>2021.12.18.2037</Version>
-    <PackageVersion>2021.12.18.2037</PackageVersion>
-    <Authors>Andrei Ignat</Authors>
-    <Description>This package make you an interface and  record from static properties / methods </Description>
-    <Title>StaticToClass</Title>
-    <PackageId>RSCG_Static</PackageId>
-    <PackageTags>C#;.NET;ASP.NET Core;Roslyn;RSCG</PackageTags>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackageIcon>static.png</PackageIcon>
-    <RepositoryUrl>https://github.com/ignatandrei/RSCG_Static</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/ignatandrei/RSCG_Static</PackageProjectUrl>
-    <RepositoryType>GIT</RepositoryType>
-    <Copyright>MIT</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <IncludeSymbols>true</IncludeSymbols>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <DebugType>embedded</DebugType>
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<CompilerVisibleProperty Include="RootNamespace" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<None Include="readme.md" Pack="true" PackagePath="\" />
+		<None Include="../../docs/static.png" Pack="true" PackagePath="\" />
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
+	</ItemGroup>
+	<PropertyGroup>
+		<Version>2021.12.18.2037</Version>
+		<PackageVersion>2021.12.18.2037</PackageVersion>
+		<Authors>Andrei Ignat</Authors>
+		<Description>This package make you an interface and  record from static properties / methods </Description>
+		<Title>StaticToClass</Title>
+		<PackageId>RSCG_Static</PackageId>
+		<PackageTags>C#;.NET;ASP.NET Core;Roslyn;RSCG</PackageTags>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+		<PackageIcon>static.png</PackageIcon>
+		<RepositoryUrl>https://github.com/ignatandrei/RSCG_Static</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/ignatandrei/RSCG_Static</PackageProjectUrl>
+		<RepositoryType>GIT</RepositoryType>
+		<Copyright>MIT</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<IncludeSymbols>true</IncludeSymbols>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<Deterministic>true</Deterministic>
+		<DebugType>embedded</DebugType>
+
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 
 
 </Project>
