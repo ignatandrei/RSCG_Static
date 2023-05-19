@@ -6,19 +6,23 @@ More, there is a MakeNew static method created to can have DI.
 
 Just put a function like this ( example for System.DateTime)
 ```csharp
-        public partial ISystem_DateTime FromStaticDate(DateTime doesNotMatter);
+        public Type GenerateInterfaceFromDate()=>typeof(DateTime);
 ```
-( i.e. I<Full_Name_To_Static_Class)
+
 
 and the properties of the classes will be generated into interfaces and you can write:
 
 ```csharp
-var  dateStatic1 = (new Program().FromStaticDate());//static
-var dateStatic2 = recISystem_DateTime.MakeNew();//static
-var dateVar3 = new clsISystem_DateTime();//variable = real 
-await Task.Delay(10*1000);
-Console.WriteLine(dateStatic1.Now.Second);
-Console.WriteLine(dateStatic2.Now.Second);
-Console.WriteLine(dateVar3.Now.Second);
+//for DI, register
+//ISystem_DateTime  with transient for new clsSystem_DateTime()
+Console.WriteLine("Hello World!");
+ISystem_DateTime dateStatic = recSystem_DateTime.MakeNew();//static
+ISystem_DateTime dateVar = new clsSystem_DateTime(); //variable = real 
+
+Console.WriteLine(dateStatic.Now.Second);
+Console.WriteLine(dateVar.Now.Second);
+await Task.Delay(10 * 1000);
+Console.WriteLine(dateStatic.Now.Second);
+Console.WriteLine(dateVar.Now.Second);
 ```
 
