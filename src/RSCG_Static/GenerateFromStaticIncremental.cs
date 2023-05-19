@@ -25,10 +25,26 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
     {
         var methods = context
                     .SyntaxProvider
-                  .CreateSyntaxProvider(GenerateInterfaceFrom, GetPartialMethod)
+                  .CreateSyntaxProvider(GenerateInterfaceFrom, GetReturnTypeFromMethod)
                   .Where(type => type.Item1 is not null)
                   .Collect();
-        
+        context.RegisterSourceOutput(methods, GenerateText);
+
+    }
+
+    private (MethodDeclarationSyntax, ITypeSymbol) GetReturnTypeFromMethod(GeneratorSyntaxContext gsc, CancellationToken arg2)
+    {
+        if (gsc.Node is not MethodDeclarationSyntax met) return (null, null);
+        //if (!met.Identifier.Text.StartsWith("FromStatic")) return (null, null);
+        //if (met.ParameterList.Parameters.Count != 1) return (null, null);
+        var nodes = met.ChildNodes().ToArray();
+        var n = nodes[2].ChildNodes().ToArray();
+        var env = n[0].ChildNodes().ToArray();
+        var ins = env[0];
+        var type = gsc.SemanticModel.GetSymbolInfo(ins);
+        //if (type == null) return (null, null);
+        return (met, type.Symbol as ITypeSymbol);
+        //return (null, null);
     }
 
     private bool GenerateInterfaceFrom(SyntaxNode syntaxNode, CancellationToken arg2)
