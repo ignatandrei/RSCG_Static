@@ -1,10 +1,16 @@
 name: .NET
 
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - "vRelease*"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,23 +23,14 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 7.0.x
-    - name: Restore dependencies
-      run: |
-        cd src 
-        dotnet restore
-    - name: Build
-      run: |
-        cd src 
-        dotnet build --no-restore
     - name: pack
       run: | 
         cd src     
-        cd RSCG_Static
-        dotnet pack -o nugetPackages --no-build --include-symbols --include-source 
-    - name: 'Upload nuget'
-      uses: actions/upload-artifact@v2
-      with:
-        name: StaticNuget_${{github.run_number}}
-        path: src/RSCG_Static/nugetPackages
-        retention-days: 1
+        dotnet tool restore
+        dotnet r pack
         
+
+    - name: push to nuget
+      run: |
+          dotnet nuget push ${{github.workspace}}/src/RSCG_Static/PACK/*symb*.*pkg --api-key  ${{ secrets.NUGETAPIKEY }} --source https://api.nuget.org/v3/index.json
+
