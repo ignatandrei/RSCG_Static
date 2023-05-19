@@ -26,3 +26,7 @@ Console.WriteLine(dateStatic.Now.Second);
 Console.WriteLine(dateVar.Now.Second);
 ```
 
+
+# More Roslyn Source Code Generators
+
+You can find more RSCG with examples at [Roslyn Source Code Generators](https://ignatandrei.github.io/RSCG_Examples/v2/)
