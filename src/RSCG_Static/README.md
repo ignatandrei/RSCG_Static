@@ -6,7 +6,7 @@ More, there is a MakeNew static method created to can have DI.
 
 Just put a function like this ( example for System.DateTime)
 ```csharp
-        public partial ISystem_DateTime FromStaticDate();
+        public partial ISystem_DateTime FromStaticDate(DateTime doesNotMatter);
 ```
 ( i.e. I<Full_Name_To_Static_Class)
 
