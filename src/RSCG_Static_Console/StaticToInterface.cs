@@ -8,6 +8,7 @@ public partial class StaticToInterface
     public Type GenerateInterfaceFromEnvironment()
     {
         return typeof(Environment);
+        
     }
     //public partial ISystem_Environment FromStaticEnv(Environment doesNotMatter);
     public partial ISystem_DateTime FromStaticDate(DateTime doesNotMatter);

@@ -16,16 +16,45 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var methods= context
+        GenerateInterfaceFrom(context);
+        FromStatic(context);
+
+    }
+
+    private void GenerateInterfaceFrom(IncrementalGeneratorInitializationContext context)
+    {
+        var methods = context
+                    .SyntaxProvider
+                  .CreateSyntaxProvider(GenerateInterfaceFrom, GetPartialMethod)
+                  .Where(type => type.Item1 is not null)
+                  .Collect();
+        
+    }
+
+    private bool GenerateInterfaceFrom(SyntaxNode syntaxNode, CancellationToken arg2)
+    {
+        if (syntaxNode is not MethodDeclarationSyntax met)
+            return false;
+        
+        var ins = (met.ReturnType as IdentifierNameSyntax)?.Identifier.Text;
+        if(ins == null) return false;
+        if (!(ins.ToLower() == "type" || ins.ToLower() == "system.type")) return false;
+        var text = met.Identifier.Text.ToLower();
+        return text.ToLower().StartsWith("GenerateInterfaceFrom".ToLower());
+
+    }
+
+    private void FromStatic(IncrementalGeneratorInitializationContext context)
+    {
+        var methods = context
                     .SyntaxProvider
                   .CreateSyntaxProvider(CouldBeMethodPartial, GetPartialMethod)
                   .Where(type => type.Item1 is not null)
                   .Collect();
-        context.RegisterSourceOutput(methods, act1);
+        context.RegisterSourceOutput(methods, GenerateText);
     }
 
-
-    private void act1(SourceProductionContext spc, ImmutableArray<(MethodDeclarationSyntax, ITypeSymbol)> arg2)
+    private void GenerateText(SourceProductionContext spc, ImmutableArray<(MethodDeclarationSyntax, ITypeSymbol)> arg2)
     {
         var data = arg2.Distinct();
         foreach(var item in data)
