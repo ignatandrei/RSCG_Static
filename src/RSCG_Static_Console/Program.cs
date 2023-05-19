@@ -1,17 +1,16 @@
 ﻿using RSCG_Static_Console;
 using System;
 using System.Threading.Tasks;
-
+//for DI, register
+//ISystem_DateTime  with transient for new clsSystem_DateTime()
 Console.WriteLine("Hello World!");
-ISystem_DateTime dateStatic1 = (new StaticToInterface()).FromStaticDate(DateTime.Now);//static
-ISystem_DateTime dateStatic2 = recISystem_DateTime.MakeNew();//static
-ISystem_DateTime dateVar3 = new clsISystem_DateTime(); //variable = real 
-Console.WriteLine(dateStatic1.Now.Second);
-Console.WriteLine(dateStatic2.Now.Second);
-Console.WriteLine(dateVar3.Now.Second);
-await Task.Delay(10 * 1000);
-Console.WriteLine(dateStatic1.Now.Second);
-Console.WriteLine(dateStatic2.Now.Second);
-Console.WriteLine(dateVar3.Now.Second);
-await Task.Delay(10 * 1000);
+ISystem_DateTime dateStatic = recSystem_DateTime.MakeNew();//static
+ISystem_DateTime dateVar = new clsSystem_DateTime(); //variable = real 
 
+Console.WriteLine(dateStatic.Now.Second);
+Console.WriteLine(dateVar.Now.Second);
+await Task.Delay(10 * 1000);
+Console.WriteLine(dateStatic.Now.Second);
+Console.WriteLine(dateVar.Now.Second);
+
+//Console.ReadLine();

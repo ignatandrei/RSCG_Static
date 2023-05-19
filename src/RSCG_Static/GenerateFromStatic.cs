@@ -8,6 +8,7 @@ using System.Reflection;
 namespace RSCG_Static
 {
     //[Generator]
+    [Obsolete]
     public class GenerateFromStatic : ISourceGenerator
     {
                 

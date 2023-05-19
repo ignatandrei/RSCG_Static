@@ -16,21 +16,21 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        GenerateInterfaceFrom(context);
+        //GenerateInterfaceFrom(context);
         FromStatic(context);
 
     }
 
-    private void GenerateInterfaceFrom(IncrementalGeneratorInitializationContext context)
-    {
-        var methods = context
-                    .SyntaxProvider
-                  .CreateSyntaxProvider(GenerateInterfaceFrom, GetReturnTypeFromMethod)
-                  .Where(type => type.Item1 is not null)
-                  .Collect();
-        context.RegisterSourceOutput(methods, GenerateText);
+    //private void GenerateInterfaceFrom(IncrementalGeneratorInitializationContext context)
+    //{
+    //    var methods = context
+    //                .SyntaxProvider
+    //              .CreateSyntaxProvider(GenerateInterfaceFrom, GetReturnTypeFromMethod)
+    //              .Where(type => type.Item1 is not null)
+    //              .Collect();
+    //    context.RegisterSourceOutput(methods, GenerateText);
 
-    }
+    //}
 
     private (MethodDeclarationSyntax, ITypeSymbol) GetReturnTypeFromMethod(GeneratorSyntaxContext gsc, CancellationToken arg2)
     {
@@ -56,7 +56,8 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
         if(ins == null) return false;
         if (!(ins.ToLower() == "type" || ins.ToLower() == "system.type")) return false;
         var text = met.Identifier.Text.ToLower();
-        return text.ToLower().StartsWith("GenerateInterfaceFrom".ToLower());
+        var shouldGenerate= text.ToLower().StartsWith("GenerateInterfaceFrom".ToLower());
+        return shouldGenerate;
 
     }
 
@@ -64,8 +65,8 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
     {
         var methods = context
                     .SyntaxProvider
-                  .CreateSyntaxProvider(CouldBeMethodPartial, GetPartialMethod)
-                  .Where(type => type.Item1 is not null)
+                  .CreateSyntaxProvider(GenerateInterfaceFrom, GetReturnTypeFromMethod)
+                  .Where(type =>  type.Item1 is not null)
                   .Collect();
         context.RegisterSourceOutput(methods, GenerateText);
     }
@@ -88,85 +89,85 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                 }
                 sn = sn.Parent;
             }
-            var ret = (met.ReturnType as IdentifierNameSyntax)?.Identifier.Text;
-            string nameType = ret.Replace("_", ".")?.Substring(1);
+            var ret = item.Item2.ToDisplayString();
+            string nameInterface = ret.Replace(".", "_");
             var props = fromType(item.Item2);
-            var optionalArgPartial = $"{item.Item2.ToDisplayString()} doesNotMatter";
-
-            var template = this.GenerateImplementation(props, strNamespace, ret, cd.Identifier.Text, met.Identifier.Text, nameType, optionalArgPartial);
+            var template = this.GenerateImplementation(props, strNamespace, ret, nameInterface);
             spc.AddSource(met.Identifier.Text, template);
         }
 
 
     }
-    string GenerateImplementation(ToGenerate[] props, string strNamespace, string ret, string className, string funcName, string fullNameType, string optionalArgPartial)
+    string GenerateImplementation(ToGenerate[] props, string strNamespace, string fullNameType, string nameInterface)
     {
         var rn = "\r\n";
-        var template = "";
+        var template = $"{rn}#nullable enable";
         template += $"{rn} namespace {strNamespace} {{";
-        template += $"{rn} public interface {ret} {{";
+        template += $"{rn}      public interface I{nameInterface} {{";
         foreach (var prop in props)
         {
             switch (prop.symbolKind)
             {
                 case SymbolKind.Property:
-                    template += $"{rn} {prop.TypeName} {prop.Name}  {{get;}}";
+                    template += $"{rn}          public {prop.TypeName} {prop.Name}  {{get;}}";
                     break;
                 case SymbolKind.Method:
-                    template += $"{rn} {prop.TypeName} {prop.Name}();";
+                    template += $"{rn}          public {prop.TypeName} {prop.Name}();";
                     break;
                 default:
                     throw new ArgumentException("do not support " + prop.symbolKind);
             }
 
         }
-        template += $"{rn} }}// interface";
+        template += $"{rn}      }}// interface";
         template += $"{rn}//now the partial class";
-        template += $"{rn} public record rec{ret} ";
+        template += $"{rn}      public record rec{nameInterface} ";
         var strDef = props.Where(it => it.symbolKind == SymbolKind.Property).Select(it => $"{it.TypeName} {it.Name}").ToArray();
-        template += $"({string.Join(",", strDef)}) : {ret}";
-        template += $"{rn} {{ ";
-        template += $"{rn}public static rec{ret} MakeNew() {{";
+        template += $"({string.Join(",", strDef)}) : I{nameInterface}";
+        template += $"{rn}      {{ ";
+        template += $"{rn}            public static rec{nameInterface} MakeNew() {{";
         var strConstrParams = props.Where(it => it.symbolKind == SymbolKind.Property).Select(it => $"{fullNameType}.{it.Name}");
-        template += $"{rn}return new rec{ret}({string.Join(",", strConstrParams)});";
-        template += $"{rn} }} //end makenew";
+        template += $"{rn}            return new rec{nameInterface}({string.Join(",", strConstrParams)});";
+        template += $"{rn}            }} //end makenew";
         var methods = props.Where(it => it.symbolKind == SymbolKind.Method).ToArray();
         foreach (var prop in methods)
         {
             var isVoid = (prop.TypeName.ToLower() == "void");
             var retData = isVoid ? "" : "return";
-            template += $"{rn}public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
+            template += $"{rn}            public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
 
         }
         //adding methods
 
-        template += $"{rn} }} //end record";
+        template += $"{rn}      }} //end record";
 
-        template += $"{rn} public class cls{ret} : {ret} ";
-        template += $"{rn} {{ ";
+        template += $"{rn}      public class cls{nameInterface} : I{nameInterface} ";
+        template += $"{rn}      {{ ";
         foreach (var prop in props)
         {
             switch (prop.symbolKind)
             {
                 case SymbolKind.Property:
-                    template += $"{rn}public  {prop.TypeName} {prop.Name}  {{get {{ return {fullNameType}.{prop.Name}; }} }}";
+                    template += $"{rn}            public {prop.TypeName} {prop.Name}  {{get {{ return {fullNameType}.{prop.Name}; }} }}";
                     break;
                 case SymbolKind.Method:
                     var isVoid = (prop.TypeName.ToLower() == "void");
                     var retData = isVoid ? "" : "return";
-                    template += $"{rn}public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
+                    template += $"{rn}            public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
                     break;
             }
         }
-        template += $"{rn} }} //end record";
-        template += $"{rn}partial class {className} {{";
+        template += $"{rn}       }} //end class";
+        //template += $"{rn}partial class {className} {{";
 
-        template += $"{rn}public partial {ret} {funcName}({optionalArgPartial}) {{";
+        //template += $"{rn}public partial {fullNameType} {funcName}({optionalArgPartial}) {{";
 
-        template += $"{rn}return rec{ret}.MakeNew();";
-        template += $"{rn} }} // method";
-        template += $"{rn} }} // class";
+        //template += $"{rn}return rec{fullNameType}.MakeNew();";
+        //template += $"{rn} }} // method";
+        //template += $"{rn} }} // class";
         template += $"{rn} }} // namespace";
+        template += $"{rn}#nullable disable";
+
         return template;
     }
 
