@@ -112,7 +112,24 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                     template += $"{rn}          public {prop.TypeName} {prop.Name}  {{get;}}";
                     break;
                 case SymbolKind.Method:
-                    template += $"{rn}          public {prop.TypeName} {prop.Name}();";
+                    template += $"{rn}          public {prop.TypeName} {prop.Name}";
+                    var parameters = prop.MethodSymbol.Parameters;
+                    if(parameters.Length == 0)
+                    {
+                        template += "();";
+                    }
+                    else
+                    {
+                        
+                        System.Diagnostics.Debugger.Break();
+                        template += "(";
+                        var arrParams=parameters
+                            .Select(it => it.Type.ToDisplayString() + " " + it.Name)
+                            .ToArray();
+                        template += string.Join(",", arrParams);
+                        template += ");";
+
+                    }
                     break;
                 default:
                     throw new ArgumentException("do not support " + prop.symbolKind);
@@ -182,11 +199,13 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                    (it.Kind == SymbolKind.Property
                    ||
                    (
-                       it.Kind == SymbolKind.Method 
-                       && 
-                       (it as IMethodSymbol).Parameters.Length == 0
+                       it.Kind == SymbolKind.Method
+                       //&& 
+                       //(it as IMethodSymbol).Parameters.Length == 0
                        &&
                        (it as IMethodSymbol).MethodKind != MethodKind.PropertyGet
+                       &&
+                       (it as IMethodSymbol).MethodKind != MethodKind.PropertySet
                     ))
                    )
                    .Select(it =>
@@ -199,6 +218,7 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                            case SymbolKind.Method:
                                var typeName = (it as IMethodSymbol).ReturnType;
                                ret.TypeName = typeName.ToDisplayString();
+                               ret.MethodSymbol = (it as IMethodSymbol);
                                break;
                            case SymbolKind.Property:
                                ret.TypeName = (it as IPropertySymbol).Type.ToDisplayString();

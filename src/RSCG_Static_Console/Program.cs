@@ -13,4 +13,7 @@ await Task.Delay(10 * 1000);
 Console.WriteLine(dateStatic.Now.Second);
 Console.WriteLine(dateVar.Now.Second);
 
+var docs=Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+var env = new clsSystem_Environment();
+var docs1 = env.UserName;
 //Console.ReadLine();

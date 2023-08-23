@@ -8,5 +8,6 @@ namespace RSCG_Static
         public string TypeName { get; set; }
 
         public SymbolKind symbolKind { get; set; }
+        public IMethodSymbol MethodSymbol { get; internal set; }
     }
 }
