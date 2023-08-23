@@ -98,6 +98,23 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
 
 
     }
+    private string nameParamToCall(IParameterSymbol it)
+    {
+        var name = it.Name;
+        var before = "";
+        switch (it.RefKind)
+        {
+            case RefKind.Ref:
+                before = "ref ";
+                break;
+            case RefKind.Out:
+                before = "out ";
+                break;
+            default:
+                break;
+        }
+        return before + name;
+    }
     string GenerateImplementation(ToGenerate[] props, string strNamespace, string fullNameType, string nameInterface)
     {
         var rn = "\r\n";
@@ -121,10 +138,9 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                     else
                     {
                         
-                        System.Diagnostics.Debugger.Break();
                         template += "(";
                         var arrParams=parameters
-                            .Select(it => it.Type.ToDisplayString() + " " + it.Name)
+                            .Select(it => it.ToDisplayString() )
                             .ToArray();
                         template += string.Join(",", arrParams);
                         template += ");";
@@ -151,7 +167,37 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
         {
             var isVoid = (prop.TypeName.ToLower() == "void");
             var retData = isVoid ? "" : "return";
-            template += $"{rn}            public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
+            var parameters = prop.MethodSymbol.Parameters;
+            var argsMethod = "";
+            var callMethodArgs = "";
+            if (parameters.Length == 0)
+            {
+                argsMethod += "()";
+                callMethodArgs += "()";
+
+            }
+            else
+            {
+
+                argsMethod += "(";
+                callMethodArgs += "(";
+
+                var arrParams = parameters
+                    .Select(it => it.ToDisplayString())
+                    .ToArray();
+                var nameParams= parameters
+                    .Select(it => nameParamToCall( it))
+                    .ToArray();
+                argsMethod += string.Join(",", arrParams);
+                callMethodArgs += string.Join(",", nameParams);
+
+                argsMethod += ")";
+                callMethodArgs += ")";
+
+
+            }
+
+            template += $"{rn}            public  {prop.TypeName} {prop.Name} {argsMethod}  {{  {retData} {fullNameType}.{prop.Name}{callMethodArgs};  }}";
 
         }
         //adding methods
@@ -170,7 +216,39 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                 case SymbolKind.Method:
                     var isVoid = (prop.TypeName.ToLower() == "void");
                     var retData = isVoid ? "" : "return";
-                    template += $"{rn}            public  {prop.TypeName} {prop.Name}()  {{  {retData} {fullNameType}.{prop.Name}();  }}";
+                    var parameters = prop.MethodSymbol.Parameters;
+                    var argsMethod = "";
+                    var callMethodArgs = "";
+                    if (parameters.Length == 0)
+                    {
+                        argsMethod += "()";
+                        callMethodArgs += "()";
+
+                    }
+                    else
+                    {
+
+                        argsMethod += "(";
+                        callMethodArgs += "(";
+
+                        var arrParams = parameters
+                            .Select(it => it.ToDisplayString())
+                            .ToArray();
+                        var nameParams = parameters
+                            .Select(it => nameParamToCall(it))
+                            .ToArray();
+                        argsMethod += string.Join(",", arrParams);
+                        callMethodArgs += string.Join(",", nameParams);
+
+                        argsMethod += ")";
+                        callMethodArgs += ")";
+
+
+                    }
+
+
+
+                    template += $"{rn}            public  {prop.TypeName} {prop.Name}{argsMethod}  {{  {retData} {fullNameType}.{prop.Name}{callMethodArgs};  }}";
                     break;
             }
         }
@@ -200,12 +278,16 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
                    ||
                    (
                        it.Kind == SymbolKind.Method
-                       //&& 
-                       //(it as IMethodSymbol).Parameters.Length == 0
+                       && 
+                       (it as IMethodSymbol)!=null 
                        &&
                        (it as IMethodSymbol).MethodKind != MethodKind.PropertyGet
                        &&
+                       (it as IMethodSymbol).MethodKind == MethodKind.Ordinary
+                       &&
                        (it as IMethodSymbol).MethodKind != MethodKind.PropertySet
+                       && 
+                       (it as IMethodSymbol).Parameters.All(it=>!it.ToDisplayString().Contains("`1"))
                     ))
                    )
                    .Select(it =>
