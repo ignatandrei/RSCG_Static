@@ -9,6 +9,8 @@ Just put a function like this ( example for System.DateTime)
         public Type GenerateInterfaceFromDate()=>typeof(DateTime);
 ```
 
+The same trigger also generates a static-abstract version for the intercepted type, following the `ITestData` / `TestDataImplDefault` pattern from the sample code.
+
 
 and the properties of the classes will be generated into interfaces and you can write:
 
