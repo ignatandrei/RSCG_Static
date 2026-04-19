@@ -34,31 +34,12 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
 
     private (MethodDeclarationSyntax, ITypeSymbol) GetReturnTypeFromMethod(GeneratorSyntaxContext gsc, CancellationToken arg2)
     {
-        if (gsc.Node is not MethodDeclarationSyntax met) return (null, null);
-        //if (!met.Identifier.Text.StartsWith("FromStatic")) return (null, null);
-        //if (met.ParameterList.Parameters.Count != 1) return (null, null);
-        var nodes = met.ChildNodes().ToArray();
-        var n = nodes[2].ChildNodes().ToArray();
-        var env = n[0].ChildNodes().ToArray();
-        var ins = env[0];
-        var type = gsc.SemanticModel.GetSymbolInfo(ins);
-        //if (type == null) return (null, null);
-        return (met, type.Symbol as ITypeSymbol);
-        //return (null, null);
+        return StaticGenerationHelpers.GetReturnTypeFromMethod(gsc, arg2);
     }
 
     private bool GenerateInterfaceFrom(SyntaxNode syntaxNode, CancellationToken arg2)
     {
-        if (syntaxNode is not MethodDeclarationSyntax met)
-            return false;
-        
-        var ins = (met.ReturnType as IdentifierNameSyntax)?.Identifier.Text;
-        if(ins == null) return false;
-        if (!(ins.ToLower() == "type" || ins.ToLower() == "system.type")) return false;
-        var text = met.Identifier.Text.ToLower();
-        var shouldGenerate= text.ToLower().StartsWith("GenerateInterfaceFrom".ToLower());
-        return shouldGenerate;
-
+        return StaticGenerationHelpers.IsTriggerMethod(syntaxNode, arg2, "GenerateInterfaceFrom");
     }
 
     private void FromStatic(IncrementalGeneratorInitializationContext context)
@@ -77,21 +58,10 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
         foreach(var item in data)
         {
             var met = item.Item1;
-            var cd = met.Parent as ClassDeclarationSyntax;
-            string strNamespace = null;
-            var sn = cd.Parent;
-            while (sn != null)
-            {
-                if (sn is BaseNamespaceDeclarationSyntax nsp)
-                {
-                    strNamespace = (nsp.Name as IdentifierNameSyntax).Identifier.Text;
-                    break;
-                }
-                sn = sn.Parent;
-            }
+            var strNamespace = StaticGenerationHelpers.GetNamespace(met);
             var ret = item.Item2.ToDisplayString();
             string nameInterface = ret.Replace(".", "_");
-            var props = fromType(item.Item2);
+            var props = StaticGenerationHelpers.FromType(item.Item2);
             var template = this.GenerateImplementation(props, strNamespace, ret, nameInterface);
             spc.AddSource(met.Identifier.Text, template);
         }
@@ -100,26 +70,14 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
     }
     private string nameParamToCall(IParameterSymbol it)
     {
-        var name = it.Name;
-        var before = "";
-        switch (it.RefKind)
-        {
-            case RefKind.Ref:
-                before = "ref ";
-                break;
-            case RefKind.Out:
-                before = "out ";
-                break;
-            default:
-                break;
-        }
-        return before + name;
+        return StaticGenerationHelpers.NameParamToCall(it);
     }
     string GenerateImplementation(ToGenerate[] props, string strNamespace, string fullNameType, string nameInterface)
     {
         var rn = "\r\n";
         var template = $"{rn}#nullable enable";
-        template += $"{rn} namespace {strNamespace} {{";
+        if (!string.IsNullOrWhiteSpace(strNamespace))
+            template += $"{rn} namespace {strNamespace} {{";
         template += $"{rn}      public interface I{nameInterface} {{";
         foreach (var prop in props)
         {
@@ -260,7 +218,8 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
         //template += $"{rn}return rec{fullNameType}.MakeNew();";
         //template += $"{rn} }} // method";
         //template += $"{rn} }} // class";
-        template += $"{rn} }} // namespace";
+        if (!string.IsNullOrWhiteSpace(strNamespace))
+            template += $"{rn} }} // namespace";
         template += $"{rn}#nullable disable";
 
         return template;
@@ -268,51 +227,7 @@ public class GenerateFromStaticIncremental : IIncrementalGenerator
 
     ToGenerate[] fromType(ITypeSymbol t1)
     {
-        return 
-        t1.GetMembers()
-                   .Where(it =>
-                   it.IsStatic == true &&
-                   it.DeclaredAccessibility == Accessibility.Public
-                   &&
-                   (it.Kind == SymbolKind.Property
-                   ||
-                   (
-                       it.Kind == SymbolKind.Method
-                       && 
-                       (it as IMethodSymbol)!=null 
-                       &&
-                       (it as IMethodSymbol).MethodKind != MethodKind.PropertyGet
-                       &&
-                       (it as IMethodSymbol).MethodKind == MethodKind.Ordinary
-                       &&
-                       (it as IMethodSymbol).MethodKind != MethodKind.PropertySet
-                       && 
-                       (it as IMethodSymbol).Parameters.All(it=>!it.ToDisplayString().Contains("`1"))
-                    ))
-                   )
-                   .Select(it =>
-                   {
-                       var ret = new ToGenerate();
-                       ret.Name = it.Name;
-                       ret.symbolKind = it.Kind;
-                       switch (it.Kind)
-                       {
-                           case SymbolKind.Method:
-                               var typeName = (it as IMethodSymbol).ReturnType;
-                               ret.TypeName = typeName.ToDisplayString();
-                               ret.MethodSymbol = (it as IMethodSymbol);
-                               break;
-                           case SymbolKind.Property:
-                               ret.TypeName = (it as IPropertySymbol).Type.ToDisplayString();
-                               break;
-                           default:
-                               throw new ArgumentException("cannot have " + it.Kind);
-
-
-                       }
-                       return ret;
-                   })
-                   .ToArray();
+        return StaticGenerationHelpers.FromType(t1);
     }
     private (MethodDeclarationSyntax,ITypeSymbol) GetPartialMethod(GeneratorSyntaxContext gsc, CancellationToken arg2)
     {

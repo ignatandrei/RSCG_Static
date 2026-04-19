@@ -9,7 +9,7 @@ ISystem_DateTime dateVar = new clsSystem_DateTime(); //variable = real
 
 Console.WriteLine(dateStatic.Now.Second);
 Console.WriteLine(dateVar.Now.Second);
-await Task.Delay(10 * 1000);
+await Task.Delay(3 * 1000);
 Console.WriteLine(dateStatic.Now.Second);
 Console.WriteLine(dateVar.Now.Second);
 
@@ -17,3 +17,8 @@ var docs=Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 var env = new clsSystem_Environment();
 var docs1 = env.UserName;
 //Console.ReadLine();
+
+var time = IDateTime.GetNow<DateTimeTest>();
+Console.WriteLine(time.ToString());
+time= IDateTime.GetNow<DateTimeImplDefault>();
+Console.WriteLine(time.ToString());
