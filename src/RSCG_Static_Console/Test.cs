@@ -158,25 +158,3 @@ public class DateTimeTest : IDateTime
         throw new NotImplementedException();
     }
 }
-public class TestData
-{
-    public static string GetData() => "Hello World";
-    
-}
-
-public interface ITestData{
-
-    static abstract string GetData();
-    public static string GetData<T>() where T : ITestData
-    {
-        return T.GetData();
-    }
- }
-
-public class TestDataImplDefault : ITestData
-{
-    public static string GetData()
-    {
-        return TestData.GetData();
-    }
-}
